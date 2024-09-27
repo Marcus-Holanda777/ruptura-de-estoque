@@ -382,8 +382,3 @@ def main_ruptura(
             dfs.to_parquet(nome_saida, index=False)
 
     return dfs
-
-
-if __name__ == '__main__':
-    df = transform_ruptura(r'C:\Users\26834\Downloads\447-01032023\CSMINV.accdb')
-    df.to_excel('teste.xlsx', index=False)
