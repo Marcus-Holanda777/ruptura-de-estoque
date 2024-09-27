@@ -1,0 +1,15 @@
+/build
+/dist
+/venv
+/__pycache__
+__pycache__
+dist
+venv
+build
+*.json
+*.csv
+*.xlsx
+*.parquet
+*.spec
+*.accdb
+*$.xlsx
