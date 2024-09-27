@@ -163,7 +163,17 @@ def get_table(
             .pipe(drop_columns_na)
             .pipe(converter_numeric_txt)
         )
-    
+
+
+def conds_sub_estoque(df: pd.DataFrame) -> pd.Series:
+    """condicoes para o subestoque"""
+
+    return (
+        (df['prme_vl_conffinal'] == df['qtde_subestoque']) 
+        & 
+        (df['qtde_subestoque'] > 0)
+    )
+
 
 def transform_produto(file_path: Path | str) -> pd.DataFrame:
     # NOTE: Retorna tabela do kardex
@@ -198,7 +208,7 @@ def transform_produto(file_path: Path | str) -> pd.DataFrame:
     mestre = (
         get_table(file_path, 'PRODUTO_MESTRE', dtype={'PRFI_VL_CMPG': 'float', 'PRFI_VL_PRECOVENDA': 'float'})
          .join(get_table(file_path, "PARAMETRO_GERAL", parse_dates=[('PAGE_DH_INCLUSAO', True)]), how='cross')
-         .loc[lambda _df: (_df['prme_vl_conffinal'] == _df['qtde_subestoque']) & (_df['qtde_subestoque'] > 0) , :]
+         .loc[lambda _df: conds_sub_estoque(_df) , :]
          .assign(valor_total = lambda _df: _df['prfi_vl_cmpg'] * _df['prme_vl_conffinal'])
          .loc[:, ['page_dh_inclusao', 'page_cd_filial', 'prfi_vl_cmpg', 'prme_cd_produto', 'prme_vl_conffinal', 'valor_total']]
     )
@@ -215,6 +225,7 @@ def transform_produto(file_path: Path | str) -> pd.DataFrame:
 
 
 def transform_ruptura(file_path: Path | str) -> pd.DataFrame:
+
     mestre = (
         get_table(file_path, 'PRODUTO_MESTRE', dtype={'PRFI_VL_CMPG': 'float', 'PRFI_VL_PRECOVENDA': 'float'})
         .join(get_table(file_path, "PARAMETRO_GERAL", parse_dates=[('PAGE_DH_INCLUSAO', True)]), how='cross')
@@ -223,7 +234,7 @@ def transform_ruptura(file_path: Path | str) -> pd.DataFrame:
             valor_estq_init   = lambda df: df['prfi_qt_estoqatual'] * df['prfi_vl_cmpg'],
             qtd_sku_estq      = lambda df: df['prme_vl_conffinal'].where(df['prme_vl_conffinal'] > 0),
             valor_estq        = lambda df: df['prme_vl_conffinal'] * df['prfi_vl_cmpg'],
-            qtd_sku_rup       = lambda df: df['qtde_subestoque'].where((df['prme_vl_conffinal'] == df['qtde_subestoque']) & (df['qtde_subestoque'] > 0)),
+            qtd_sku_rup       = lambda df: df['qtde_subestoque'].where(conds_sub_estoque(df)),
         )
         .assign(valor_rup    = lambda df: df['qtd_sku_rup'] * df['prfi_vl_cmpg'])
         .groupby(['page_cd_filial', 'page_dh_inclusao'], as_index=False)
@@ -289,10 +300,10 @@ def main_produtos(
             .merge(categ, on=["prme_cd_produto"])
         )
 
-        progress_callback.emit((valor + 1, 'Produtos Consolidado'))
         now = f'{datetime.now():%d%m%Y_%H%M%S}'
-        
         nome_saida = f'Produtos_{now}.{export}'
+
+        progress_callback.emit((valor + 1, f'Produtos Consolidado: {nome_saida}'))
 
         if export == 'xlsx':
            dfs.to_excel(nome_saida, index=False)
@@ -320,10 +331,10 @@ def main_ruptura(
     else:
         dfs = pd.concat(pre_dfs, ignore_index=True)
 
-        progress_callback.emit((valor + 1, 'Ruptura Consolidada'))
-        now = f'{datetime.now():%d%m%Y_%H%M%S}'
-        
+        now = f'{datetime.now():%d%m%Y_%H%M%S}'        
         nome_saida = f'Ruptura_{now}.{export}'
+
+        progress_callback.emit((valor + 1, f'Ruptura Consolidada: {nome_saida}'))
 
         if export == 'xlsx':
            dfs.to_excel(nome_saida, index=False)

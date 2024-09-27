@@ -8,6 +8,8 @@ from config import (
 from utils import main_ruptura
 from pathlib import Path
 from worker import Worker
+import os
+import subprocess
 
 
 class Ruptura(QDialog):
@@ -126,6 +128,9 @@ class Ruptura(QDialog):
             "Finalizado com sucesso !",
             QMessageBox.StandardButton.Ok
         )
+        
+        # abre o local que fica o excel
+        subprocess.Popen(['explorer', os.getcwd()], shell=True)
     
     def worker_error(self, error):
         self.progress.setStyleSheet("""
