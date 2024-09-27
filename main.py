@@ -55,7 +55,6 @@ class MainWindow(QMainWindow):
         self.lbl_img = QLabel()
         self.lbl_img.setPixmap(img)
         self.lbl_img.setAlignment(Qt.AlignCenter)
-        self.lbl_img.setDisabled(True)
 
         self.setCentralWidget(self.lbl_img)
     

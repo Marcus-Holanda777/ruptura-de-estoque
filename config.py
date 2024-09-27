@@ -7,6 +7,8 @@ CONFIG_FILE = DEFAULT_RAIZ / 'start.json'
 
 ICON = str(DEFAULT_RAIZ.joinpath('img/armazem.png'))
 IMG = str(DEFAULT_RAIZ.joinpath('img/troca.png'))
+IMG_PROD = str(DEFAULT_RAIZ.joinpath('img/produto.png'))
+IMG_RUP = str(DEFAULT_RAIZ.joinpath('img/ruptura.png'))
 
 
 def read_start_json() -> dict:

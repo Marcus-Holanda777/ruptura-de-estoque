@@ -4,7 +4,8 @@ from PySide6.QtCore import *
 from config import (
     read_start_json,
     is_start_json,
-    ICON
+    ICON,
+    IMG_PROD
 )
 from utils import main_produtos
 from pathlib import Path
@@ -21,7 +22,7 @@ class Produtos(QDialog):
         # TODO: Configura DIALOGO
         self.setWindowTitle("Gera Produtos")
         self.setWindowIcon(QIcon(ICON))
-        self.setFixedSize(500, 200)
+        self.setFixedSize(500, 350)
         
         # TODO: Definir style
         self.setStyleSheet("""
@@ -64,9 +65,16 @@ class Produtos(QDialog):
         # TODO: Logas
         self.logs = QLabel("...")
         self.logs.setAlignment(Qt.AlignmentFlag.AlignRight)
+
+        # TODO: Adicionar IMAGEM
+        img = QPixmap(IMG_PROD)
+        self.lbl_img = QLabel()
+        self.lbl_img.setPixmap(img)
+        self.lbl_img.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
         # TODO: Layout
         self.vlayout = QVBoxLayout()
+        self.vlayout.addWidget(self.lbl_img)
         self.vlayout.addWidget(self.input)
         self.vlayout.addWidget(self.btn_dir)
         self.vlayout.addWidget(self.label)
