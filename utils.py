@@ -8,8 +8,21 @@ from unicodedata import combining, normalize
 from athena_mvsh import CursorPython, Athena
 import os
 from datetime import datetime
-import numpy as np
+import logging
 
+
+FILE_LOGS = logging.FileHandler(
+    'logs.txt',
+    mode='a',
+    encoding='utf_8'
+)
+
+logging.basicConfig(
+    level=logging.INFO, 
+    handlers=[FILE_LOGS],
+    format='%(asctime)s - %(levelname)s - %(message)s', 
+    datefmt='%d/%m/%Y %H:%M:%S'
+)
 
 driver_str = (
     'DRIVER={{Microsoft Access Driver (*.mdb, *.accdb)}};'
@@ -284,13 +297,26 @@ def main_produtos(
 
     pre_dfs = []
     for valor, file in enumerate(raiz, 2):
-        df = transform_produto(file)
-        pre_dfs.append(df)
-
         out_file_log = '/'.join(file.parts[-2:])
-        progress_callback.emit((valor, f"Transformando, {out_file_log}"))
+
+        try:
+            df = transform_produto(file)
+            pre_dfs.append(df)
+
+            progress_callback.emit((valor, f"Transformando, {out_file_log}"))
+
+        except Exception as e:
+            progress_callback.emit((valor, f"Error, {out_file_log}"))
+            logging.warning(f"{e} @{file}")
+            continue
 
     else:
+
+        if not pre_dfs:
+            msg_error = "Erro em todas os bancos listados !"
+            logging.warning(f"{msg_error}")
+            raise ValueError(msg_error)
+        
         dfs = (
             pd.concat(pre_dfs, ignore_index=True)
             .loc[:, lambda _df: sorted(_df.columns.to_list(), key=lambda k: 10 if k == 'vendas' else 1)]
@@ -324,11 +350,23 @@ def main_ruptura(
     pre_dfs = []
     for valor, file in enumerate(raiz, 2):
         out_file_log = '/'.join(file.parts[-2:])
-        progress_callback.emit((valor, f"Transformando, {out_file_log}"))
 
-        df = transform_ruptura(file)
-        pre_dfs.append(df)
+        try:
+            progress_callback.emit((valor, f"Transformando, {out_file_log}"))
+            df = transform_ruptura(file)
+            pre_dfs.append(df)
+
+        except Exception as e:
+            progress_callback.emit((valor, f"Error, {out_file_log}"))
+            logging.warning(f"{e} @{file}")
+            continue
+
     else:
+        if not pre_dfs:
+            msg_error = "Erro em todas os bancos listados !"
+            logging.warning(f"{msg_error}")
+            raise ValueError(msg_error)
+        
         dfs = pd.concat(pre_dfs, ignore_index=True)
 
         now = f'{datetime.now():%d%m%Y_%H%M%S}'        

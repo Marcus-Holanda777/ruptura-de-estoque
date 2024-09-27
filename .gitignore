@@ -13,3 +13,4 @@ build
 *.spec
 *.accdb
 *$.xlsx
+*.txt
