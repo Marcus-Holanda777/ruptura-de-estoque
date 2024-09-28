@@ -19,3 +19,5 @@ Este projeto é um aplicativo desktop desenvolvido em **Python** utilizando o fr
 - **AWS Athena**: Para consulta de categorias de produtos.
 - **pyodbc**: Para conexão com bancos de dados ACCDB.
 - **pandas**: Para manipulação e análise de dados.
+
+![Interface do Sistema](img/menu.png)
