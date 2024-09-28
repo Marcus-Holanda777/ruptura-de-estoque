@@ -23,8 +23,8 @@ Este projeto é um aplicativo desktop desenvolvido em **Python** utilizando o fr
 ## Interface Gráfica
 
 <div style="display: inline-block;">
-    <img src="img/menu.png" alt="Interface do Sistema" style="width: 300px; height: 300px;" />
-    <img src="img/login_tela.png" alt="Interface do Sistema" style="width: 300px; height: 300px;" />
-    <img src="img/produtos_tela.png" alt="Interface do Sistema" style="width: 300px; height: 300px;" />
-    <img src="img/ruptura_tela.png" alt="Interface do Sistema" style="width: 300px; height: 300px;" />
+    <img src="img/menu.png" alt="Interface do Sistema" style="width: 350px; height: 300px;" />
+    <img src="img/login_tela.png" alt="Interface do Sistema" style="width: 350px; height: 300px;" />
+    <img src="img/produtos_tela.png" alt="Interface do Sistema" style="width: 350px; height: 300px;" />
+    <img src="img/ruptura_tela.png" alt="Interface do Sistema" style="width: 350px; height: 300px;" />
 </div>
