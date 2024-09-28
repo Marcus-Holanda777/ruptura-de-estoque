@@ -18,6 +18,14 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("Ruptura 1.0")
         self.setWindowIcon(QIcon(ICON))
+
+        # TODO: Estilo do Menu
+        self.menuBar().setStyleSheet("""
+            font-size: 12px; 
+            font-weight: bold; 
+            color: #424f63;
+        """)
+        self.menuBar().setFixedHeight(30)
         
         # TODO: Menu principal
         menu = self.menuBar().addMenu("&Menu")

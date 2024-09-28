@@ -68,7 +68,7 @@ class Login(QDialog):
         self.group_s3.setLayout(self.layout_group_s3)
 
         # TODO: GRUPO Conexao
-        self.group_aut = QGroupBox("Autentication")
+        self.group_aut = QGroupBox("Authenticate")
         self.layout_group_aut = QVBoxLayout()
         self.layout_group_aut.addWidget(QLabel("Nome usuario"))
         self.layout_group_aut.addWidget(self.aws_access_key_id)

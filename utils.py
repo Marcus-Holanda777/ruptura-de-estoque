@@ -164,9 +164,10 @@ def get_table(
             df = df.astype(dtype)
 
         if parse_dates:
-            df = df.assign(**{
-                col: lambda _df, c=col,d=days: pd.to_datetime(_df[c], dayfirst=d) 
-                for col, days in parse_dates
+            df = df.assign(
+                **{
+                    col: lambda _df, c=col,d=days: pd.to_datetime(_df[c], dayfirst=d) 
+                    for col, days in parse_dates
                 }
             )
 
@@ -179,12 +180,15 @@ def get_table(
 
 
 def conds_sub_estoque(df: pd.DataFrame) -> pd.Series:
-    """condicoes para o subestoque"""
+    """condicoes para o subestoque
+    eq ==
+    gt >
+    """
 
     return (
-        (df['prme_vl_conffinal'] == df['qtde_subestoque']) 
+        (df['prme_vl_conffinal'].eq(df['qtde_subestoque'])) 
         & 
-        (df['qtde_subestoque'] > 0)
+        (df['qtde_subestoque'].gt(0))
     )
 
 
@@ -192,7 +196,7 @@ def transform_produto(file_path: Path | str) -> pd.DataFrame:
     # NOTE: Retorna tabela do kardex
     kardex = (
         get_table(file_path, "KARDEX_FILIAL") 
-        .loc[lambda _df: _df['kafi_tp_mov'] == 'SV', :]
+        .loc[lambda _df: _df['kafi_tp_mov'].eq('SV'), :]
         .assign(valor = lambda _df: _df['kafi_qt_saldo'].mul(_df['kafi_vl_cmpg']))
         .groupby(['kafi_cd_produto', pd.Grouper(key='kafi_dt_mov', freq='MS')])
         .agg({'kafi_qt_saldo': 'sum', 'valor': 'sum'})
@@ -222,7 +226,7 @@ def transform_produto(file_path: Path | str) -> pd.DataFrame:
         get_table(file_path, 'PRODUTO_MESTRE', dtype={'PRFI_VL_CMPG': 'float', 'PRFI_VL_PRECOVENDA': 'float'})
          .join(get_table(file_path, "PARAMETRO_GERAL", parse_dates=[('PAGE_DH_INCLUSAO', True)]), how='cross')
          .loc[lambda _df: conds_sub_estoque(_df) , :]
-         .assign(valor_total = lambda _df: _df['prfi_vl_cmpg'] * _df['prme_vl_conffinal'])
+         .assign(valor_total = lambda _df: _df['prfi_vl_cmpg'].mul(_df['prme_vl_conffinal']))
          .loc[:, ['page_dh_inclusao', 'page_cd_filial', 'prfi_vl_cmpg', 'prme_cd_produto', 'prme_vl_conffinal', 'valor_total']]
     )
 
@@ -243,13 +247,13 @@ def transform_ruptura(file_path: Path | str) -> pd.DataFrame:
         get_table(file_path, 'PRODUTO_MESTRE', dtype={'PRFI_VL_CMPG': 'float', 'PRFI_VL_PRECOVENDA': 'float'})
         .join(get_table(file_path, "PARAMETRO_GERAL", parse_dates=[('PAGE_DH_INCLUSAO', True)]), how='cross')
         .assign(
-            qtd_sku_estq_init = lambda df: df['prfi_qt_estoqatual'].where(df['prfi_qt_estoqatual'] > 0),
-            valor_estq_init   = lambda df: df['prfi_qt_estoqatual'] * df['prfi_vl_cmpg'],
-            qtd_sku_estq      = lambda df: df['prme_vl_conffinal'].where(df['prme_vl_conffinal'] > 0),
-            valor_estq        = lambda df: df['prme_vl_conffinal'] * df['prfi_vl_cmpg'],
+            qtd_sku_estq_init = lambda df: df['prfi_qt_estoqatual'].where(df['prfi_qt_estoqatual'].gt(0)),
+            valor_estq_init   = lambda df: df['prfi_qt_estoqatual'].mul(df['prfi_vl_cmpg']),
+            qtd_sku_estq      = lambda df: df['prme_vl_conffinal'].where(df['prme_vl_conffinal'].gt(0)),
+            valor_estq        = lambda df: df['prme_vl_conffinal'].mul(df['prfi_vl_cmpg']),
             qtd_sku_rup       = lambda df: df['qtde_subestoque'].where(conds_sub_estoque(df)),
         )
-        .assign(valor_rup    = lambda df: df['qtd_sku_rup'] * df['prfi_vl_cmpg'])
+        .assign(valor_rup     = lambda df: df['qtd_sku_rup'].mul(df['prfi_vl_cmpg']))
         .groupby(['page_cd_filial', 'page_dh_inclusao'], as_index=False)
         .agg(
             qtd_sku_estq_init  = ('qtd_sku_estq_init', 'count'),
