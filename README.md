@@ -20,8 +20,11 @@ Este projeto é um aplicativo desktop desenvolvido em **Python** utilizando o fr
 - **pyodbc**: Para conexão com bancos de dados ACCDB.
 - **pandas**: Para manipulação e análise de dados.
 
+## Interface Gráfica
+
 <div style="display: inline-block;">
     <img src="img/menu.png" alt="Interface do Sistema" style="width: 300px; height: 300px;" />
     <img src="img/produtos_tela.png" alt="Interface do Sistema" style="width: 300px; height: 300px;" />
+    <img src="img/ruptura_tela.png" alt="Interface do Sistema" style="width: 300px; height: 300px;" />
 </div>
 
